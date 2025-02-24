@@ -1,0 +1,136 @@
+name: CI/CD Pipeline Dashboard - DEV
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'student-dashboard/**'
+      - '.github/workflows/deploy-dashboard-to-aws-dev.*'
+
+jobs:
+
+  test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Build Student dashboard
+      working-directory: ./student-dashboard
+      run: |
+        npm install
+        npm run build
+    - name: Install AWS CDK
+      run: |
+        npm install -g aws-cdk
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+        aws-region: af-south-1
+    - name: Install Python dependencies
+      working-directory: ./student-dashboard/cdk
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Deploy CDK application
+      working-directory: ./student-dashboard/cdk
+      run: |
+        DEPLOY_STAGE=DEV cdk synth
+
+  deploy:
+    needs: test-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Build Student dashboard
+      working-directory: ./student-dashboard
+      run: |
+        npm install
+        npm run build
+    - name: Install AWS CDK
+      run: |
+        npm install -g aws-cdk
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+        aws-region: af-south-1
+    - name: Install Python dependencies
+      working-directory: ./student-dashboard/cdk
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Deploy CDK application
+      working-directory: ./student-dashboard/cdk
+      run: |
+        DEPLOY_STAGE=DEV cdk deploy --require-approval never
+    - name: Capture Deploy Output
+      id: deploy-output
+      if: always()
+      run: |
+        output=$(tail -n 10 $GITHUB_STEP_SUMMARY)
+        echo "::set-output name=summary::$output"
+
+    - name: Send success msg to CICD channel
+      if: success()
+      uses: fadenb/matrix-chat-message@v0.0.6
+      with:
+        homeserver: 'matrix.wethinkcode.co.za'
+        token: ${{ secrets.MATRIX_TOKEN }}
+        channel: ${{ secrets.MATRIX_ROOM_ID }}
+        message: |
+          LMS Dashboard _Development_ build & deploy **Succeeded**.\
+          \
+          View job output: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    - name: Send failure msg to CICD channel
+      if: failure()
+      uses: fadenb/matrix-chat-message@v0.0.6
+      with:
+        homeserver: 'matrix.wethinkcode.co.za'
+        token: ${{ secrets.MATRIX_TOKEN }}
+        channel: ${{ secrets.MATRIX_ROOM_ID }}
+        message: |
+          LMS Dashboard _Development_ build & deploy **Failed**.\
+          \
+          View job output: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  send-test2-failed:
+    if: failure()
+    needs: test-deploy
+    runs-on: ubuntu-latest
+    name: Send CDK tests failed
+    steps:
+    - name: Send message to CICD channel
+      id: matrix-chat-message
+      uses: fadenb/matrix-chat-message@v0.0.6
+      with:
+        homeserver: 'matrix.wethinkcode.co.za'
+        token: ${{ secrets.MATRIX_TOKEN }}
+        channel: ${{ secrets.MATRIX_ROOM_ID }}
+        message: |
+          [_DEV_] CDK Dashboard Tests are **failing**. Check your constructs.\
+          \
+          View job output: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
