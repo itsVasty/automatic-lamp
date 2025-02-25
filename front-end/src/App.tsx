@@ -18,8 +18,8 @@ export default function App() {
   return (
     //Create Google Login Button
     <>
-      <GoogleLogin onSuccess={handleSuccess} onError={handleFailure}/> 
       <ModuleStudentDashboard/>
+      <GoogleLogin onSuccess={handleSuccess} onError={handleFailure}/> 
     </>
   )
 }
