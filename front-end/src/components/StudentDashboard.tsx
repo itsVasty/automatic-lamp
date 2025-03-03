@@ -6,6 +6,7 @@ import {Skills} from './Skills/Skills';
 
 
 export const ModuleStudentDashboard: React.FC<{token : any}> = ({token}) => {
+  
   return(
     <>
       <div>
@@ -20,6 +21,7 @@ export const ModuleStudentDashboard: React.FC<{token : any}> = ({token}) => {
           <Schedule/>
         </div>
       </div>
+      <button onClick={() => {localStorage.removeItem('token')}}>Logout</button>
     </>
   )
 }
