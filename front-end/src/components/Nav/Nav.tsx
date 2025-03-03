@@ -1,8 +1,7 @@
 import React from 'react';
-import { useLocalStorage } from '../../localstorage';
 
-export const Nav: React.FC = () => {
-  const [token, setToken] = useLocalStorage('token','')
+
+export const Nav: React.FC<{token : any}> = ({token} : any) => {
   return(
     <div>
       {token.email}

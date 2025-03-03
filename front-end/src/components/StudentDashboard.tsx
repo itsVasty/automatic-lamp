@@ -5,11 +5,11 @@ import {Activity} from './Activity/Activity';
 import {Skills} from './Skills/Skills';
 
 
-export const ModuleStudentDashboard: React.FC = () => {
+export const ModuleStudentDashboard: React.FC<{token : any}> = ({token}) => {
   return(
     <>
       <div>
-        <Nav/>
+        <Nav token={token}/>
       </div>
       <div>
         <div>
