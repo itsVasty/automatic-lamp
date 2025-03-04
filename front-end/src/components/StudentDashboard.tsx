@@ -1,16 +1,18 @@
-import React from 'react';
+import { useContext } from 'react';
 import {Nav} from './Nav/Nav';
 import {Schedule} from './Schedule/Schedule';
 import {Activity} from './Activity/Activity';
 import {Skills} from './Skills/Skills';
+import { googleContext } from '../auth';
 
 
-export const ModuleStudentDashboard: React.FC<{token : any}> = ({token}) => {
+export const ModuleStudentDashboard = () => {
+  let { signOut } : any = useContext(googleContext) || { signOut: () => {} };
   
   return(
     <>
       <div>
-        <Nav token={token}/>
+        <Nav />
       </div>
       <div>
         <div>
@@ -21,7 +23,9 @@ export const ModuleStudentDashboard: React.FC<{token : any}> = ({token}) => {
           <Schedule/>
         </div>
       </div>
-      <button onClick={() => {localStorage.removeItem('token')}}>Logout</button>
+      <button onClick={() => {
+        signOut()
+      }}>Logout</button>
     </>
   )
 }

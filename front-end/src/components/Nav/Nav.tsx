@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { googleContext } from '../../auth';
 
 
-export const Nav: React.FC<{token : any}> = ({token} : any) => {
+export const Nav = () => {
+  let { token } = useContext(googleContext) || { token: { email: "not logged in" } };
   return(
     <div>
       {token.email}

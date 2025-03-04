@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 import { useLocalStorage } from "./localstorage";
 import { jwtDecode } from "jwt-decode";
 
-export let googleContext = createContext(null);
+export let googleContext: any = createContext(null);
 
 export function GoogleLoginGate({ children }: { children: React.ReactNode }) {
     const [token, setToken] = useLocalStorage('token', '');
@@ -25,7 +25,12 @@ export function GoogleLoginGate({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <googleContext.Provider value={token}>
+        <googleContext.Provider value={{
+            token,
+            signOut: () => {
+                setToken('')
+            }
+        }}>
             {children}
         </googleContext.Provider>
     );
