@@ -1,25 +1,22 @@
 import './App.css'
-import { useContext } from 'react';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import { googleContext } from './auth';
-import { Nav } from './components/Nav/Nav';
 import Home from './components/Home/Home';
 import Student from './components/Student/Student';
+import Sidebar from './components/Sidebar/Sidebar';
 
-export default function App() {
-  let { signOut } : any = useContext(googleContext) || { signOut: () => {} };
-  
+export default function App() {  
   return(
     <>
       <Router>
-        <Nav/>
-        <Routes>
-          <Route path='/' Component={Home}/>
-          <Route path='/student' Component={Student}/>
-        </Routes>
-        <button onClick={() => {
-          signOut()
-        }}>Logout</button>
+        <div className='app'>
+          <Sidebar/>
+          <main className='main-content'>
+            <Routes>
+              <Route path='/' Component={Home}/>
+              <Route path='/student' Component={Student}/>
+            </Routes>
+          </main>
+        </div>
       </Router>
     </>
   )
