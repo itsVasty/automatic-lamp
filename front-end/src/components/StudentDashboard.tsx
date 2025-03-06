@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import {Nav} from './Nav/Nav';
-import {Schedule} from './Schedule/Schedule';
-import {Activity} from './Activity/Activity';
-import {Skills} from './Skills/Skills';
 import { googleContext } from '../auth';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import Home from './Home/Home';
+import Student from './Student/Student';
 
 
 export const ModuleStudentDashboard = () => {
@@ -11,21 +11,16 @@ export const ModuleStudentDashboard = () => {
   
   return(
     <>
-      <div>
-        <Nav />
-      </div>
-      <div>
-        <div>
-          <Activity/>
-          <Skills/>
-        </div>
-        <div>
-          <Schedule/>
-        </div>
-      </div>
-      <button onClick={() => {
-        signOut()
-      }}>Logout</button>
+      <Router>
+        <Nav/>
+        <Routes>
+          <Route path='/' Component={Home}/>
+          <Route path='/student' Component={Student}/>
+        </Routes>
+        <button onClick={() => {
+          signOut()
+        }}>Logout</button>
+      </Router>
     </>
   )
 }
