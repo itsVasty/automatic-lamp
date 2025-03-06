@@ -1,2 +1,2 @@
 # automatic-lamp
-WTC LMS Student Dashboard Frontend 
+WTC LMS Student Dashboard Frontend Sandbox
